@@ -2,6 +2,7 @@
 import EventCard from "@/components/EventCard.vue";
 import EventService from "@/services/EventService.js";
 import { onMounted, ref, computed, watchEffect } from "vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps(["page"]);
 
@@ -24,7 +25,9 @@ onMounted(() => {
         totalEvents.value = response.headers["x-total-count"];
       })
       .catch((error) => {
-        console.log(error);
+        router.push({
+          name: "NetworkError",
+        });
       });
   });
 });
@@ -34,18 +37,22 @@ onMounted(() => {
   <h1>Events for Good</h1>
   <div class="events">
     <EventCard v-for="event in events" :key="event.id" :event="event" />
-    <router-link
-      :to="{ name: 'EventList', query: { page: page - 1 } }"
-      rel="prev"
-      v-if="page != 1"
-      >Prev page</router-link
-    >
-    <router-link
-      :to="{ name: 'EventList', query: { page: page + 1 } }"
-      rel="next"
-      v-if="hasNextPage"
-      >Next page</router-link
-    >
+    <div class="pagination">
+      <router-link
+        id="page-prev"
+        :to="{ name: 'EventList', query: { page: page - 1 } }"
+        rel="prev"
+        v-if="page != 1"
+        >&#60; Previous</router-link
+      >
+      <router-link
+        id="page-next"
+        :to="{ name: 'EventList', query: { page: page + 1 } }"
+        rel="next"
+        v-if="hasNextPage"
+        >Next &#62;</router-link
+      >
+    </div>
   </div>
 </template>
 
@@ -54,5 +61,23 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.pagination {
+  margin-top: 10px;
+  display: flex;
+  width: 290px;
+}
+.pagination a {
+  flex: 1;
+  text-decoration: none;
+  color: #2c3e50;
+}
+
+#page-prev {
+  text-align: left;
+}
+
+#page-next {
+  text-align: right;
 }
 </style>
